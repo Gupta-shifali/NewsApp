@@ -1,6 +1,7 @@
 package com.example.hpnotebook.newstime;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.ListPreference;
@@ -8,6 +9,7 @@ import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.DatePicker;
 
 import java.util.Calendar;
@@ -20,6 +22,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = SettingsActivity.class.getName();
     private static Preference mPreference;
+    private static String dob;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,12 +44,26 @@ public class SettingsActivity extends AppCompatActivity {
             Preference pgSize = findPreference(getString(R.string.settings_page_size_key));
             bindPreferenceSummaryToValue(pgSize);
             Preference date = findPreference(getString(R.string.settings_date_key));
-            bindPreferenceSummaryToValue(date);
+            date.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick(Preference preference) {
+                    showDatePicker();
+                    return true;
+                }
+            });
+            mPreference = date;
         }
 
         private void bindPreferenceSummaryToValue(Preference preference) {
             preference.setOnPreferenceChangeListener(this);
-
+            if(preference.getKey().equals("date")){
+                Log.v(LOG_TAG,"inide if");
+                SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPref.edit();
+                editor.putString(getString(R.string.settings_date_key), dob);
+                Log.v(LOG_TAG, dob);
+                editor.commit();
+            }
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(preference.getContext());
             String preferenceString = preferences.getString(preference.getKey(), "");
             onPreferenceChange(preference, preferenceString);
@@ -54,12 +71,7 @@ public class SettingsActivity extends AppCompatActivity {
 
         @Override
         public boolean onPreferenceChange(Preference preference, Object value) {
-            mPreference = preference;
             String stringValue = value.toString();
-            if (preference.equals("date")) {
-                showDatePicker();
-                return true;
-            }
             if (preference instanceof ListPreference) {
                 ListPreference listPreference = (ListPreference) preference;
                 int prefIndex = listPreference.findIndexOfValue(stringValue);
@@ -74,12 +86,13 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         private void showDatePicker() {
+
+            Log.v(LOG_TAG, "inside showDatePicker");
             DatePickerFragment date = new DatePickerFragment();
 
             /**
              * Set Up Current Date Into dialog
              */
-
             Calendar calender = Calendar.getInstance();
             Bundle args = new Bundle();
             args.putInt("year", calender.get(Calendar.YEAR));
@@ -92,6 +105,7 @@ public class SettingsActivity extends AppCompatActivity {
              */
             date.setCallBack(ondate);
             date.show(getFragmentManager(), "Date Picker");
+            bindPreferenceSummaryToValue(mPreference);
 
         }
 
@@ -99,8 +113,7 @@ public class SettingsActivity extends AppCompatActivity {
             @Override
             public void onDateSet(DatePicker view, int year, int monthOfYear,
                                   int dayOfMonth) {
-                String dob = String.valueOf(dayOfMonth) + "/" + String.valueOf(monthOfYear) + "/" + String.valueOf(year);
-                mPreference.setSummary(dob);
+                dob = String.valueOf(year) + "-" + String.valueOf(monthOfYear+1) + "-" + String.valueOf(dayOfMonth);
             }
         };
     }

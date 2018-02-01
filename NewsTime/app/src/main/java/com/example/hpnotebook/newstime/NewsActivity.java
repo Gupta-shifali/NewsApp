@@ -86,16 +86,14 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
                 getString(R.string.settings_date_key),
                 getString(R.string.settings_date_default)
         );
-        String formattedDate = formatDate(date);
-
         Uri baseUri = Uri.parse(REQUEST_URL);
         Uri.Builder uriBuilder = baseUri.buildUpon();
 
-        Log.v(LOG_TAG, section + " " + orderBy + " " + pgSize + " " + formattedDate);
+        Log.v(LOG_TAG, section + " " + orderBy + " " + pgSize + " " + date);
         uriBuilder.appendQueryParameter("q", section);
         uriBuilder.appendQueryParameter("order-by", orderBy);
         uriBuilder.appendQueryParameter("page-size", pgSize);
-        uriBuilder.appendQueryParameter("from-date", formattedDate);
+        uriBuilder.appendQueryParameter("from-date", date);
 
         return new NewsLoader(this, uriBuilder.toString());
 
@@ -132,17 +130,5 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private String formatDate(String date){
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        Date dateObject = new Date();
-        try{
-            dateObject = dateFormat.parse(date);
-        }
-        catch (ParseException e){
-            Log.e("NewsAdapter", "Problem parsing the date", e);
-        }
-        return dateObject.toString();
     }
 }
