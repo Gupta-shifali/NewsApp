@@ -18,7 +18,10 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class NewsActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<List<News>>{
@@ -83,13 +86,16 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
                 getString(R.string.settings_date_key),
                 getString(R.string.settings_date_default)
         );
+        String formattedDate = formatDate(date);
+
         Uri baseUri = Uri.parse(REQUEST_URL);
         Uri.Builder uriBuilder = baseUri.buildUpon();
 
+        Log.v(LOG_TAG, section + " " + orderBy + " " + pgSize + " " + formattedDate);
         uriBuilder.appendQueryParameter("q", section);
         uriBuilder.appendQueryParameter("order-by", orderBy);
         uriBuilder.appendQueryParameter("page-size", pgSize);
-        uriBuilder.appendQueryParameter("from-date", date);
+        uriBuilder.appendQueryParameter("from-date", formattedDate);
 
         return new NewsLoader(this, uriBuilder.toString());
 
@@ -97,11 +103,10 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader<List<News>> loader, List<News> news) {
-        Log.v("my_tag", "news data is :"+news.toString()) ;
         loadingIndicator.setVisibility(View.GONE);
         mEmptyStateTextView.setText(R.string.no_news);
         mAdapter.clear();
-        if(news!=null && news.isEmpty()){
+        if(news!=null && !news.isEmpty()){
             mAdapter.addAll(news);
             mAdapter.notifyDataSetChanged();
         }
@@ -127,5 +132,17 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private String formatDate(String date){
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        Date dateObject = new Date();
+        try{
+            dateObject = dateFormat.parse(date);
+        }
+        catch (ParseException e){
+            Log.e("NewsAdapter", "Problem parsing the date", e);
+        }
+        return dateObject.toString();
     }
 }

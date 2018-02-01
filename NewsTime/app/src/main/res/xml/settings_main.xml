@@ -23,11 +23,9 @@
         android:key="@string/settings_page_size_key"
         android:title="@string/settings_page_size_label" />
 
-    <EditTextPreference
+    <Preference
         android:defaultValue="@string/settings_date_default"
-        android:inputType="date"
         android:key="@string/settings_date_key"
-        android:selectAllOnFocus="true"
         android:title="@string/settings_date_label" />
 
 </PreferenceScreen>

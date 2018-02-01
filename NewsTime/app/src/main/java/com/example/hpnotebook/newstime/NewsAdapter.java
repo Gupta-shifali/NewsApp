@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -46,12 +47,6 @@ public class NewsAdapter extends ArrayAdapter<News>{
 
         TextView section = (TextView) listItemView.findViewById(R.id.section);
         section.setText(currentNews.getSection());
-        Log.i(LOG_TAG, "adapter..............");
-        Log.v(LOG_TAG, currentNews.getSection());
-        Log.v(LOG_TAG, currentNews.getHeading());
-        Log.v(LOG_TAG, currentNews.getDetails());
-        Log.v(LOG_TAG, currentNews.getDate());
-        Log.v(LOG_TAG, currentNews.getAuthor());
 
         ImageView imageView = (ImageView) listItemView.findViewById(R.id.image);
         String imgUri = currentNews.getUrl();
@@ -65,10 +60,8 @@ public class NewsAdapter extends ArrayAdapter<News>{
         detailsView.setText(currentNews.getDetails());
 
         TextView dateView = (TextView) listItemView.findViewById(R.id.date);
-
-        Date dateObject = new Date(currentNews.getDate());
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy");
-        dateView.setText(dateFormat.format(dateObject));
+        String date = formatDate(currentNews.getDate());
+        dateView.setText(date);
 
         TextView authorView = (TextView) listItemView.findViewById(R.id.author);
         if(authorView != null){
@@ -89,5 +82,17 @@ public class NewsAdapter extends ArrayAdapter<News>{
         });
 
         return listItemView;
+    }
+
+    private String formatDate(String date){
+        Date dateObject = new Date();
+        try{
+            dateObject = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").parse(date);
+        }
+        catch (ParseException e){
+            Log.e("NewsAdapter", "Problem parsing the date", e);
+        }
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd, yyyy");
+        return dateFormat.format(dateObject).toString();
     }
 }

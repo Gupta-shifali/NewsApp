@@ -27,11 +27,11 @@
     <string name="page_size_10_label">10</string>
     <string name="page_size_10_value">10</string>
     <string name="page_size_20_label">20</string>
-    <string name="page_size_20_value">10</string>
+    <string name="page_size_20_value">20</string>
     <string name="page_size_30_label">30</string>
-    <string name="page_size_30_value">10</string>
+    <string name="page_size_30_value">30</string>
 
     <string name="settings_date_label">From Date</string>
     <string name="settings_date_key" translatable="false">date</string>
-    <string name="settings_date_default" translatable="false">2018-01-30</string>
+    <string name="settings_date_default" translatable="false">2017-12-30</string>
 </resources>
