@@ -61,8 +61,8 @@ public class SettingsActivity extends AppCompatActivity {
                 SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString(getString(R.string.settings_date_key), dob);
-                Log.v(LOG_TAG, dob);
-                editor.commit();
+                Log.v(LOG_TAG, dob + " inside bindPreferenceSummaryToValue");
+                editor.apply();
             }
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(preference.getContext());
             String preferenceString = preferences.getString(preference.getKey(), "");
@@ -105,8 +105,6 @@ public class SettingsActivity extends AppCompatActivity {
              */
             date.setCallBack(ondate);
             date.show(getFragmentManager(), "Date Picker");
-            bindPreferenceSummaryToValue(mPreference);
-
         }
 
         DatePickerDialog.OnDateSetListener ondate = new DatePickerDialog.OnDateSetListener() {
@@ -114,6 +112,8 @@ public class SettingsActivity extends AppCompatActivity {
             public void onDateSet(DatePicker view, int year, int monthOfYear,
                                   int dayOfMonth) {
                 dob = String.valueOf(year) + "-" + String.valueOf(monthOfYear+1) + "-" + String.valueOf(dayOfMonth);
+                Log.v(LOG_TAG, dob + " inside showDatePicker");
+                bindPreferenceSummaryToValue(mPreference);
             }
         };
     }
