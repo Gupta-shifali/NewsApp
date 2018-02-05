@@ -30,7 +30,9 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.settings_activity);
     }
 
-    public static class NewsPreferenceFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener {
+    public static class NewsPreferenceFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener, SharedPreferences.OnSharedPreferenceChangeListener{
+
+        private static final String KEY_PREF_DATE = "date";
 
         @Override
         public void onCreate(Bundle savedInstanceState) {
@@ -55,17 +57,19 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         private void bindPreferenceSummaryToValue(Preference preference) {
+            final String PREFS_NAME = "date_pref";
             preference.setOnPreferenceChangeListener(this);
-            if(preference.getKey().equals("date")){
+            if(preference.getKey().equals(KEY_PREF_DATE)){
                 Log.v(LOG_TAG,"inide if");
-                SharedPreferences sharedPref = getActivity().getPreferences(Context.MODE_PRIVATE);
+                SharedPreferences sharedPref = getActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString(getString(R.string.settings_date_key), dob);
                 Log.v(LOG_TAG, dob + " inside bindPreferenceSummaryToValue");
                 editor.apply();
             }
-            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(preference.getContext());
+            SharedPreferences preferences = preference.getContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
             String preferenceString = preferences.getString(preference.getKey(), "");
+            preference.setSummary(preferenceString);
             onPreferenceChange(preference, preferenceString);
         }
 
@@ -83,6 +87,30 @@ public class SettingsActivity extends AppCompatActivity {
                 preference.setSummary(stringValue);
             }
             return true;
+        }
+
+        @Override
+        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+            if(key.equals(KEY_PREF_DATE)){
+
+                // Set summary to be the user-description for the selected value
+                Preference date = findPreference(key);
+                String dateValue = sharedPreferences.getString(key, "");
+                Log.v(LOG_TAG, "inside onSharedPreferenceChanged " + dateValue);
+                date.setSummary(dateValue);
+            }
+        }
+
+        @Override
+        public void onResume() {
+            getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+            super.onResume();
+        }
+
+        @Override
+        public void onPause() {
+            getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+            super.onPause();
         }
 
         private void showDatePicker() {
