@@ -68,10 +68,10 @@ public class SettingsActivity extends AppCompatActivity {
                 editor.apply();
             }
             SharedPreferences preferences = preference.getContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-            PreferenceManager.setDefaultValues(getActivity() , R.xml.settings_main, false);
+            // PreferenceManager.setDefaultValues(getActivity() , R.xml.settings_main, false);
             String preferenceString = preferences.getString(preference.getKey(), "");
             preference.setSummary(preferenceString);
-            onPreferenceChange(preference, preferenceString);
+            // onPreferenceChange(preference, preferenceString);
         }
 
         @Override

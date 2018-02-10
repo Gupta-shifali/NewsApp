@@ -68,7 +68,7 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public Loader<List<News>> onCreateLoader(int i, Bundle bundle) {
 
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences sharedPrefs = this.getSharedPreferences("data_pref", MODE_PRIVATE);
 
         String section = sharedPrefs.getString(
                 getString(R.string.settings_section_key),
