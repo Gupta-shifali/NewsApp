@@ -23,6 +23,7 @@ public class SettingsActivity extends AppCompatActivity {
     private static final String LOG_TAG = SettingsActivity.class.getName();
     private static Preference mPreference;
     private static String dob;
+    public static String PREFS_NAME = "date_pref";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +58,6 @@ public class SettingsActivity extends AppCompatActivity {
         }
 
         private void bindPreferenceSummaryToValue(Preference preference) {
-            final String PREFS_NAME = "date_pref";
             preference.setOnPreferenceChangeListener(this);
             if(preference.getKey().equals(KEY_PREF_DATE)){
                 Log.v(LOG_TAG,"inide if");
