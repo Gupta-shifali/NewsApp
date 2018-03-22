@@ -12,7 +12,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.DatePicker;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Created by Hp Notebook on 29-01-2018.
@@ -22,8 +25,7 @@ public class SettingsActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = SettingsActivity.class.getName();
     private static Preference mPreference;
-    private static String dob;
-    public static String PREFS_NAME = "date_pref";
+    private static String dob = "2017-12-30";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +33,7 @@ public class SettingsActivity extends AppCompatActivity {
         setContentView(R.layout.settings_activity);
     }
 
-    public static class NewsPreferenceFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener, SharedPreferences.OnSharedPreferenceChangeListener{
+    public static class NewsPreferenceFragment extends PreferenceFragment implements Preference.OnPreferenceChangeListener{
 
         private static final String KEY_PREF_DATE = "date";
 
@@ -47,6 +49,8 @@ public class SettingsActivity extends AppCompatActivity {
             Preference pgSize = findPreference(getString(R.string.settings_page_size_key));
             bindPreferenceSummaryToValue(pgSize);
             Preference date = findPreference(getString(R.string.settings_date_key));
+            mPreference = date;
+            formatDate();
             date.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
                 @Override
                 public boolean onPreferenceClick(Preference preference) {
@@ -54,24 +58,21 @@ public class SettingsActivity extends AppCompatActivity {
                     return true;
                 }
             });
-            mPreference = date;
         }
 
         private void bindPreferenceSummaryToValue(Preference preference) {
             preference.setOnPreferenceChangeListener(this);
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(preference.getContext());
             if(preference.getKey().equals(KEY_PREF_DATE)){
-                Log.v(LOG_TAG,"inide if");
-                SharedPreferences sharedPref = getActivity().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
                 SharedPreferences.Editor editor = sharedPref.edit();
                 editor.putString(getString(R.string.settings_date_key), dob);
                 Log.v(LOG_TAG, dob + " inside bindPreferenceSummaryToValue");
                 editor.apply();
+                formatDate();
+                return;
             }
-            SharedPreferences preferences = preference.getContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-            // PreferenceManager.setDefaultValues(getActivity() , R.xml.settings_main, false);
-            String preferenceString = preferences.getString(preference.getKey(), "");
-            preference.setSummary(preferenceString);
-            // onPreferenceChange(preference, preferenceString);
+            String preferenceString = sharedPref.getString(preference.getKey(),"");
+            onPreferenceChange(preference, preferenceString);
         }
 
         @Override
@@ -88,30 +89,6 @@ public class SettingsActivity extends AppCompatActivity {
                 preference.setSummary(stringValue);
             }
             return true;
-        }
-
-        @Override
-        public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
-            if(key.equals(KEY_PREF_DATE)){
-
-                // Set summary to be the user-description for the selected value
-                Preference date = findPreference(key);
-                String dateValue = sharedPreferences.getString(key, "");
-                Log.v(LOG_TAG, "inside onSharedPreferenceChanged " + dateValue);
-                date.setSummary(dateValue);
-            }
-        }
-
-        @Override
-        public void onResume() {
-            getPreferenceManager().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
-            super.onResume();
-        }
-
-        @Override
-        public void onPause() {
-            getPreferenceManager().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
-            super.onPause();
         }
 
         private void showDatePicker() {
@@ -145,5 +122,26 @@ public class SettingsActivity extends AppCompatActivity {
                 bindPreferenceSummaryToValue(mPreference);
             }
         };
+
+        private void formatDate() {
+            SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(mPreference.getContext());
+            String preferenceString = sharedPref.getString(mPreference.getKey(),"");
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            Date myDate = null;
+            try {
+                if(preferenceString.equals("")){
+                    myDate = dateFormat.parse(dob);
+                } else{
+                    myDate = dateFormat.parse(preferenceString);
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            SimpleDateFormat date = new SimpleDateFormat("MMM dd, yyyy");
+            String finalDate = date.format(myDate);
+            mPreference.setSummary(finalDate);
+
+        }
     }
 }

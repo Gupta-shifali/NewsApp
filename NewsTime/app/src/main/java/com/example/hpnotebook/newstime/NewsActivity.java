@@ -68,8 +68,7 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public Loader<List<News>> onCreateLoader(int i, Bundle bundle) {
 
-        Log.v("my_tag", SettingsActivity.PREFS_NAME + "");
-        SharedPreferences sharedPrefs = this.getSharedPreferences(SettingsActivity.PREFS_NAME, MODE_PRIVATE);
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         String section = sharedPrefs.getString(
                 getString(R.string.settings_section_key),
@@ -87,6 +86,7 @@ public class NewsActivity extends AppCompatActivity implements LoaderManager.Loa
                 getString(R.string.settings_date_key),
                 getString(R.string.settings_date_default)
         );
+
         Log.v("my_tag", "date inside newsActivity is: "+date);
         Uri baseUri = Uri.parse(REQUEST_URL);
         Uri.Builder uriBuilder = baseUri.buildUpon();
